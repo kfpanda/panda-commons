@@ -1,9 +1,6 @@
 package com.kfpanda.util;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.Properties;
 
@@ -27,16 +24,46 @@ public class PropertiesUtil {
 	private static String configPath = null;
 	
 	private static Logger LOG = LoggerFactory.getLogger(PropertiesUtil.class);
-	
-	
+
+	/**
+	 * 扫描class路径下指定的目录的properties文件。
+	 *
+	 * @param path 为class目录下的目录路径。 path=/ 扫描class目录所有properties文件。
+	 */
+	 private static void loadProps(String path) {
+		String filePath = PropertiesUtil.class.getClassLoader().getResource("").getPath() + path;
+		File fileDir = new File(filePath);
+		File[] propsFile = fileDir.listFiles(new FilenameFilter(){
+			private String extension = ".properties";
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(extension);
+			}
+		});
+
+		if (config == null) {
+			config = new Properties();
+		}
+		for (File file : propsFile) {
+			FileInputStream fis = null;
+			try {
+				fis = new FileInputStream(file);
+				config.load(fis);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				LOG.debug("classpath 路径下, " + filePath + " 文件无法找到.");
+			} catch (IOException e) {
+				e.printStackTrace();
+				LOG.debug("classpath 路径下, " + filePath + " 文件读取失败.");
+			}
+		}
+	}
 	public static void init() {
 		LOG.info(">>> loading the properties .....");
-		String confPath = System.getProperty("application.config");
-		if(confPath == null){
-		    confPath = "properties/application.properties";
-		}
-		getInstance(confPath);
-		
+		//加载所有class目录下的所有properties文件。
+		loadProps("/");
+		//加载所有class目录下properties目录下的所有properties文件。
+		loadProps("/properties/");
 		LOG.info(">>> loaded the properties ... ... ... ... ... ... ... ... OK!");
 	}
 	
@@ -52,7 +79,7 @@ public class PropertiesUtil {
 	public static PropertiesUtil getInstance() {
 		return instance;
 	}
-	
+
 	public static Properties getConfig() {
         return config;
     }
@@ -78,6 +105,7 @@ public class PropertiesUtil {
 	 * 
 	 * @param configpath
 	 */
+	@Deprecated
 	private static void loadProperties() {
 		if (configPath == null) {
 			LOG.error("文件的路径不能为空");
@@ -94,7 +122,7 @@ public class PropertiesUtil {
 
 		if (ins == null) {
 			try {
-				ins = new FileInputStream(FilePath.getAbsolutePathWithClass() + configPath);
+				ins = new FileInputStream(PropertiesUtil.class.getClassLoader().getResource("").getPath() + configPath);
 			} catch (FileNotFoundException e) {
 				LOG.debug("classpath 路径下, " + configPath + " 文件无法找到.");
 			}
