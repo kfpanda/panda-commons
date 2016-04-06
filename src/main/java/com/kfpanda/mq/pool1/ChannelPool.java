@@ -1,4 +1,4 @@
-package com.kfpanda.mq.pool;
+package com.kfpanda.mq.pool1;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
@@ -92,7 +92,7 @@ public class ChannelPool extends Pool<Channel>{
         public void destroyObject(final Object obj) throws Exception {
             if (obj instanceof Channel) {
                 final Channel channel = (Channel) obj;
-                if(channel != null && channel.isOpen()){
+                if(channel.isOpen()){
                 	channel.close();
                 }
             }

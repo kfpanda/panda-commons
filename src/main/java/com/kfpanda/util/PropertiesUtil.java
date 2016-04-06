@@ -25,12 +25,17 @@ public class PropertiesUtil {
 	
 	private static Logger LOG = LoggerFactory.getLogger(PropertiesUtil.class);
 
+	static {
+		init();
+	}
+
 	/**
 	 * 扫描class路径下指定的目录的properties文件。
 	 *
 	 * @param path 为class目录下的目录路径。 path=/ 扫描class目录所有properties文件。
 	 */
 	 private static void loadProps(String path) {
+		@SuppressWarnings("ConstantConditions")
 		String filePath = PropertiesUtil.class.getClassLoader().getResource("").getPath() + path;
 		File fileDir = new File(filePath);
 		File[] propsFile = fileDir.listFiles(new FilenameFilter(){
@@ -45,7 +50,7 @@ public class PropertiesUtil {
 			config = new Properties();
 		}
 		for (File file : propsFile) {
-			FileInputStream fis = null;
+			FileInputStream fis;
 			try {
 				fis = new FileInputStream(file);
 				config.load(fis);
@@ -70,7 +75,7 @@ public class PropertiesUtil {
 	public static PropertiesUtil getInstance(String configpath) {
 		if (configPath == null || (!configPath.equalsIgnoreCase(configpath))){
 			configPath = configpath;
-			loadProperties();
+			init();
 		}
 			
 		return getInstance();
@@ -102,8 +107,6 @@ public class PropertiesUtil {
 
 	/**
 	 * 参数configpath可以 是远程URL 也可以是相对classpath的路径 还可以是绝对路径
-	 * 
-	 * @param configpath
 	 */
 	@Deprecated
 	private static void loadProperties() {
@@ -122,6 +125,7 @@ public class PropertiesUtil {
 
 		if (ins == null) {
 			try {
+				//noinspection ConstantConditions
 				ins = new FileInputStream(PropertiesUtil.class.getClassLoader().getResource("").getPath() + configPath);
 			} catch (FileNotFoundException e) {
 				LOG.debug("classpath 路径下, " + configPath + " 文件无法找到.");

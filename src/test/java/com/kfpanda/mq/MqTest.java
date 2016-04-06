@@ -65,7 +65,7 @@ public class MqTest {
         if(timeout > 0){
         	factory.setConnectionTimeout(timeout);
         }
-        if(virtualHost != null && virtualHost != ""){
+        if(virtualHost != null && virtualHost.equals("")){
         	factory.setVirtualHost(virtualHost);
         }
         factory.setRequestedChannelMax(20);

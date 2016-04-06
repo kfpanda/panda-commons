@@ -1,4 +1,4 @@
-package com.kfpanda.mq.pool;
+package com.kfpanda.mq.pool1;
 
 import org.apache.commons.pool.impl.GenericObjectPool.Config;
 

@@ -126,8 +126,8 @@ public class RedisUtil {
 		if (StringUtils.isNotBlank(key)) {
 			Jedis jedis = RedisUtil.getResource();
 			try {
-				List<String> result = jedis.hvals(key);
-				logger.debug("Redis.hvals : result({}).", result);
+				retValue = jedis.hvals(key);
+				logger.debug("Redis.hvals : result({}).", retValue);
 			} catch (Exception e) {
 				// 释放redis对象
 				pool.returnBrokenResource(jedis);
@@ -145,8 +145,8 @@ public class RedisUtil {
 		if (StringUtils.isNotBlank(key)) {
 			Jedis jedis = RedisUtil.getResource();
 			try {
-				Set<String> result = jedis.hkeys(key);
-				logger.debug("Redis.hkeys : result({}).", result);
+				retValue = jedis.hkeys(key);
+				logger.debug("Redis.hkeys : result({}).", retValue);
 			} catch (Exception e) {
 				// 释放redis对象
 				pool.returnBrokenResource(jedis);

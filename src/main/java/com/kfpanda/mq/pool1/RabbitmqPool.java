@@ -1,4 +1,4 @@
-package com.kfpanda.mq.pool;
+package com.kfpanda.mq.pool1;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
@@ -69,17 +69,17 @@ public class RabbitmqPool extends Pool<Connection>{
             factory.setRequestedChannelMax(30);
             factory.setHost(this.host);
             factory.setPort(this.port);
-            if(userName != null && userName != ""){
+            if(userName != null && "".equals(userName)){
             	factory.setUsername(userName);
             }
-            if(password != null && password != ""){
+            if(password != null && "".equals(password)){
             	factory.setPassword(password);
             }
             factory.setAutomaticRecoveryEnabled(true);
             if(this.timeout > 0){
             	factory.setConnectionTimeout(this.timeout);
             }
-            if(virtualHost != null && virtualHost != ""){
+            if(virtualHost != null && "".equals(virtualHost)){
             	factory.setVirtualHost(virtualHost);
             }
             conn = factory.newConnection();

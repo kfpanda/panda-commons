@@ -1,4 +1,4 @@
-package com.kfpanda.mq.pool;
+package com.kfpanda.mq.pool1;
 
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
@@ -7,7 +7,7 @@ public abstract class Pool<T> {
     private final GenericObjectPool internalPool;
 
     public Pool(final GenericObjectPool.Config poolConfig,
-            PoolableObjectFactory factory) {
+            PoolableObjectFactory<T> factory) {
         this.internalPool = new GenericObjectPool(factory, poolConfig);
     }
 
@@ -30,7 +30,7 @@ public abstract class Pool<T> {
 
     public void returnBrokenResource(final T resource) {
         try {
-			internalPool.invalidateObject(resource);
+            internalPool.invalidateObject(resource);
 		} catch (Exception e) {
 			throw new RuntimeException("Could not return the resource to the pool", e);
 		}
