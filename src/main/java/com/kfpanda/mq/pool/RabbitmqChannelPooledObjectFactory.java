@@ -23,18 +23,6 @@ import java.util.Properties;
 public class RabbitmqChannelPooledObjectFactory extends BasePooledObjectFactory<Channel> {
     private static Logger logger = LoggerFactory.getLogger(RabbitmqChannelPooledObjectFactory.class);
 
-    protected static String host;
-    protected static int port;
-    protected static int DEFAULT_PORT = 5672;
-    protected static String virtualHost;
-    protected static int timeout;
-    protected static String userName;
-    protected static String password;
-
-    protected static String queue;
-    protected static String amqDirect;
-    protected static String exchangeType;
-    protected static String routeKey;
     private ObjectPool<Connection> connectionPool;
     private static final ConnectionFactory factory = new ConnectionFactory();
 
@@ -53,21 +41,11 @@ public class RabbitmqChannelPooledObjectFactory extends BasePooledObjectFactory<
 
     @Override
     public Channel create() throws Exception {
-        Properties prop = PropertiesUtil.getConfig();
-
-        String tmout = prop.getProperty("rabbitmq.timeout");
-        queue = prop.getProperty("rabbitmq.queue");
-        amqDirect = prop.getProperty("rabbitmq.amq.direct");
-        exchangeType = prop.getProperty("rabbitmq.exchange.type");
-        routeKey = prop.getProperty("rabbitmq.route.key");
-
         Connection conn = null;
         Channel channel = null;
         try {
             conn = connectionPool.borrowObject();
             channel = conn.createChannel();
-            channel.exchangeDeclare(amqDirect, exchangeType, true);
-            channel.queueBind(queue, amqDirect, routeKey);
         } catch (Exception e) {
             logger.error("rabbitmq borrow connection error.", e);
         }
