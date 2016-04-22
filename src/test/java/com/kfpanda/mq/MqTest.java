@@ -8,16 +8,16 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.kfpanda.core.FilePath;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MqTest {
-	private static Logger logger = LoggerFactory.getLogger(MqTest.class);
+	private static Logger logger = LogManager.getLogger(MqTest.class);
 	private static final String configFilePath = "/properties/application.properties";
 	private static InputStream readProperties() throws FileNotFoundException {
 		logger.debug("加载 rabbitmq配置文件：{}", configFilePath);

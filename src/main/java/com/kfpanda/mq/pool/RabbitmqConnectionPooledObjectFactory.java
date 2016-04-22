@@ -1,16 +1,13 @@
 package com.kfpanda.mq.pool;
 
-import com.kfpanda.mq.pool1.PoolConfig;
 import com.kfpanda.util.PropertiesUtil;
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.apache.commons.pool2.BasePooledObjectFactory;
-import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -19,7 +16,7 @@ import java.util.Properties;
  * Created by kfpanda on 16-4-5.
  */
 public class RabbitmqConnectionPooledObjectFactory extends BasePooledObjectFactory<Connection> {
-    private static Logger logger = LoggerFactory.getLogger(RabbitmqConnectionPooledObjectFactory.class);
+    private static Logger logger = LogManager.getLogger(RabbitmqConnectionPooledObjectFactory.class);
 
     protected static String host;
     protected static int port;
@@ -72,6 +69,6 @@ public class RabbitmqConnectionPooledObjectFactory extends BasePooledObjectFacto
 
     @Override
     public PooledObject<Connection> wrap(Connection connection) {
-        return new DefaultPooledObject<Connection>(connection);
+        return new DefaultPooledObject(connection);
     }
 }

@@ -5,22 +5,14 @@
  */
 package com.kfpanda.redis;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
+import com.kfpanda.util.PropertiesUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.kfpanda.core.FilePath;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -32,46 +24,27 @@ import redis.clients.jedis.JedisPoolConfig;
  * @author kfpanda 2014-7-14 上午10:55:45
  */
 public class RedisUtil {
-	private static Logger logger = LoggerFactory.getLogger(RedisUtil.class);
-	private static final String configFilePath = "/properties/application.properties";
+	private static Logger logger = LogManager.getLogger(RedisUtil.class);
+
 	private static JedisPool pool = null;
-	
+
 	static {
-		Properties prop = new Properties();
-		InputStream in = null;
-		try {
-			in = readProperties();
-			prop.load(in);
-		} catch (IOException e) {
-			logger.error("redis配置文件载入失败：", e);
-		}finally{
-			IOUtils.closeQuietly(in);
-		}
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
-		poolConfig.setMaxTotal(100);
-		poolConfig.setMaxIdle(5);
-		poolConfig.setMaxWaitMillis(1000 * 100);
+		poolConfig.setMaxTotal(PropertiesUtil.getIntValue("cache.redis.max.total", 100));
+		poolConfig.setMaxIdle(PropertiesUtil.getIntValue("cache.redis.max.idle", 5));
+		poolConfig.setMaxWaitMillis(PropertiesUtil.getIntValue("cache.redis.max.waitmillis", 1000 * 100));
 		// 在borrow一个jedis实例时，是否提前进行validate操作；如果为true，则得到的jedis实例均是可用的；
 		poolConfig.setTestOnBorrow(true);
-		pool = new JedisPool(poolConfig, prop.getProperty("cache.redis.host"),
-				Integer.valueOf(prop.getProperty("cache.redis.port")));
+		pool = new JedisPool(poolConfig, PropertiesUtil.getValue("cache.redis.host"),
+				PropertiesUtil.getIntValue("cache.redis.port", 6379));
 
 	}
-	
-	private static InputStream readProperties() throws FileNotFoundException {
-		logger.debug("加载 redis配置文件：{}", configFilePath);
-		InputStream in = ClassLoader.getSystemResourceAsStream(configFilePath);
-		if (in == null) {
-			try {
-				File file = new File(FilePath.getAbsolutePathWithClass() + configFilePath);
-				in = new FileInputStream(file);
-			} catch (FileNotFoundException e) {
-				logger.error("加载redis配置文件失败:", e);
-			}
-		}
-		return in;
-	}
 
+	/**
+	 * 从连接池中获取jedis
+	 *
+	 * @return jedis对象
+	 */
 	public static Jedis getResource() {
 		return pool.getResource();
 	}
@@ -79,7 +52,6 @@ public class RedisUtil {
 	public static void returnResource(Jedis resource) {
 		pool.returnResource(resource);
 	}
-
 	/*
 	 * 释放redis对象。
 	 */
@@ -100,7 +72,7 @@ public class RedisUtil {
 				pool.returnBrokenResource(jedis);
 				e.printStackTrace();
 			} finally {
-				RedisUtil.returnResource(jedis);
+				pool.returnResource(jedis);
 			}
 		}
 	}
@@ -163,7 +135,7 @@ public class RedisUtil {
 			Jedis jedis = RedisUtil.getResource();
 			try {
 				Long result = jedis.expire(key, seconds);
-				logger.debug("Redis.expire result for key: key({}), result({}).",key, result);
+				logger.debug("Redis.expire result for key: key({}), result({}).", key, result);
 			} catch (Exception e) {
 				// 释放redis对象
 				pool.returnBrokenResource(jedis);
@@ -173,4 +145,5 @@ public class RedisUtil {
 			}
 		}
 	}
+
 }

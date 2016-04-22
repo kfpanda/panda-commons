@@ -6,7 +6,6 @@
 package com.kfpanda.mq;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Properties;
 
 import com.kfpanda.mq.pool.RabbitmqChannelPooledObjectFactory;
@@ -14,10 +13,9 @@ import com.kfpanda.mq.pool.RabbitmqConnectionPooledObjectFactory;
 import com.kfpanda.util.PropertiesUtil;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import com.kfpanda.core.json.JsonUtils;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
 
@@ -28,7 +26,7 @@ import com.rabbitmq.client.ConnectionFactory;
  * @author kfpanda 2015-4-8 上午10:55:45
  */
 public class RabbitmqUtil {
-	private static Logger logger = LoggerFactory.getLogger(RabbitmqUtil.class);
+	private static Logger logger = LogManager.getLogger(RabbitmqUtil.class);
 
 	private static GenericObjectPool<Channel> pool = null;
 	private static final ConnectionFactory factory = new ConnectionFactory();
@@ -43,7 +41,7 @@ public class RabbitmqUtil {
 		// 在borrow一个jedis实例时，是否提前进行validate操作；如果为true，则得到的jedis实例均是可用的；
 		poolConfig.setTestOnBorrow(true);
 
-		pool = new GenericObjectPool<Channel>(new RabbitmqChannelPooledObjectFactory(new RabbitmqConnectionPooledObjectFactory()), poolConfig);
+		pool = new GenericObjectPool(new RabbitmqChannelPooledObjectFactory(new RabbitmqConnectionPooledObjectFactory()), poolConfig);
 
 	}
 	
@@ -59,21 +57,5 @@ public class RabbitmqUtil {
 	public static void returnObject(Channel obj) {
 		pool.returnObject(obj);
 	}
-	
-	public static void main(String[] args) {
-		System.out.println("sdsdfsf");
-		for(int i = 0; i < 20; i++){
-			Channel channel = RabbitmqUtil.borrowObject();
-			try {
-				channel.basicPublish("direct", "", null, "test----".getBytes());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			RabbitmqUtil.returnObject(channel);
-//			closeChannel(channel);
-			System.out.println(channel + "----------" + i);
-		}
-		System.out.println("11111111111111");
-	}
+
 }
