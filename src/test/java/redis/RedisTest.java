@@ -25,4 +25,32 @@ public class RedisTest {
 
         System.out.println("end time = " + (System.currentTimeMillis() - startTime));
     }
+
+
+//    @Test
+    public void get(){
+        Jedis redis = RedisUtil.getResource();
+        redis.hget("sss", "aaa");
+        long start = System.currentTimeMillis();
+        for(int i = 0; i < 1000; i++){
+            long st = System.currentTimeMillis();
+            redis.hget("sss" + i, "aaa" + i);
+            System.out.println(System.currentTimeMillis() - st);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println(end - start);
+    }
+
+    public static void main(String[] args){
+        Jedis redis = RedisUtil.getResource();
+        redis.hget("sss", "aaa");
+        long start = System.currentTimeMillis();
+        for(int i = 0; i < 1000; i++){
+            long st = System.currentTimeMillis();
+            redis.hget("sss" + i, "aaa" + i);
+            System.out.println(System.currentTimeMillis() - st);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println(end - start);
+    }
 }

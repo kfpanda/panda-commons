@@ -5,10 +5,9 @@
  */
 package com.kfpanda.mq;
 
-import java.io.IOException;
 import java.util.Properties;
 
-import com.kfpanda.mq.pool.RabbitmqChannelPooledObjectFactory;
+import com.kfpanda.mq.pool.RabbitmqChannelPooledObjectFactory2;
 import com.kfpanda.mq.pool.RabbitmqConnectionPooledObjectFactory;
 import com.kfpanda.util.PropertiesUtil;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -17,7 +16,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.ConnectionFactory;
 
 /**
  * 类RabbitmqUtil.java的实现描述：
@@ -29,7 +27,6 @@ public class RabbitmqUtil {
 	private static Logger logger = LogManager.getLogger(RabbitmqUtil.class);
 
 	private static GenericObjectPool<Channel> pool = null;
-	private static final ConnectionFactory factory = new ConnectionFactory();
 
 	static {
 		Properties prop = PropertiesUtil.getConfig();
@@ -41,7 +38,7 @@ public class RabbitmqUtil {
 		// 在borrow一个jedis实例时，是否提前进行validate操作；如果为true，则得到的jedis实例均是可用的；
 		poolConfig.setTestOnBorrow(true);
 
-		pool = new GenericObjectPool(new RabbitmqChannelPooledObjectFactory(new RabbitmqConnectionPooledObjectFactory()), poolConfig);
+		pool = new GenericObjectPool(new RabbitmqChannelPooledObjectFactory2(new RabbitmqConnectionPooledObjectFactory()), poolConfig);
 
 	}
 	

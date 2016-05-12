@@ -49,9 +49,14 @@ public class RedisUtil {
 		return pool.getResource();
 	}
 
-	public static void returnResource(Jedis resource) {
-		pool.returnResource(resource);
+	/**
+	 * 关闭一个连接池。
+	 * @param jedis
+     */
+	public static void close(Jedis jedis) {
+		jedis.close();
 	}
+
 	/*
 	 * 释放redis对象。
 	 */
@@ -68,11 +73,10 @@ public class RedisUtil {
 					logger.debug("Redis.hdelForFields set: result({}).", result);
 				}
 			} catch (Exception e) {
-				// 释放redis对象
-				pool.returnBrokenResource(jedis);
 				e.printStackTrace();
 			} finally {
-				pool.returnResource(jedis);
+				// 释放redis对象
+				jedis.close();
 			}
 		}
 	}
@@ -84,11 +88,10 @@ public class RedisUtil {
 				long result = jedis.hdel(key, field);
 				logger.debug("Redis.hdel set: result({}).", result);
 			} catch (Exception e) {
-				// 释放redis对象
-				pool.returnBrokenResource(jedis);
 				e.printStackTrace();
 			} finally {
-				RedisUtil.returnResource(jedis);
+				// 释放redis对象
+				jedis.close();
 			}
 		}
 	}
@@ -101,11 +104,10 @@ public class RedisUtil {
 				retValue = jedis.hvals(key);
 				logger.debug("Redis.hvals : result({}).", retValue);
 			} catch (Exception e) {
-				// 释放redis对象
-				pool.returnBrokenResource(jedis);
 				e.printStackTrace();
 			} finally {
-				RedisUtil.returnResource(jedis);
+				// 释放redis对象
+				jedis.close();
 			}
 		}
 
@@ -120,11 +122,10 @@ public class RedisUtil {
 				retValue = jedis.hkeys(key);
 				logger.debug("Redis.hkeys : result({}).", retValue);
 			} catch (Exception e) {
-				// 释放redis对象
-				pool.returnBrokenResource(jedis);
 				e.printStackTrace();
 			} finally {
-				RedisUtil.returnResource(jedis);
+				// 释放redis对象
+				jedis.close();
 			}
 		}
 		return retValue;
@@ -137,11 +138,10 @@ public class RedisUtil {
 				Long result = jedis.expire(key, seconds);
 				logger.debug("Redis.expire result for key: key({}), result({}).", key, result);
 			} catch (Exception e) {
-				// 释放redis对象
-				pool.returnBrokenResource(jedis);
 				e.printStackTrace();
 			} finally {
-				RedisUtil.returnResource(jedis);
+				// 释放redis对象
+				jedis.close();
 			}
 		}
 	}

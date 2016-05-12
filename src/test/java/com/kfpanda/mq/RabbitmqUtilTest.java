@@ -26,18 +26,23 @@ public class RabbitmqUtilTest {
 
 	@Test
 	public void pubMsg() throws InterruptedException {
-		for(int i = 0; i < 20; i++){
+		RabbitmqUtil.returnObject(RabbitmqUtil.borrowObject());
+		long start = System.currentTimeMillis();
+		for(int i = 0; i < 20000; i++){
 			Channel channel = RabbitmqUtil.borrowObject();
 			try {
-				channel.basicPublish("dmq.irect", "", null, "test----".getBytes());
+				channel.exchangeDeclare("amq.direct", "direct", true);
+				channel.basicPublish("amq.direct", "test", null, "test----".getBytes());
 			} catch (IOException e) {
 				logger.error("", e);
 			}
 			RabbitmqUtil.returnObject(channel);
 //			closeChannel(channel);
-			System.out.println(channel + "----------" + i);
+//			System.out.println(channel + "----------" + i);
 		}
-		Thread.sleep(10000);
+		long end = System.currentTimeMillis();
+		System.out.println(end - start);
+//		Thread.sleep(10000);
 	}
 
 }
